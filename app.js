@@ -1,11 +1,13 @@
 const TelegramBot = require("node-telegram-bot-api");
-
+const ping = require("ping");
+const fs = require("fs");
 // replace the value below with the Telegram token you receive from @BotFather
 const token = "1258591822:AAGFIEdaJDXFap-7CZSYGg6qUns1RXfesvU";
-
+let data = [];
 // Create a bot that uses 'polling' to fetch new updates
 const bot = new TelegramBot(token, { polling: true });
 let pingtime = 1000;
+
 // Matches "/echo [whatever]"
 bot.onText(/\/site (.+)/, (msg, match) => {
   // 'msg' is the received Message from Telegram
@@ -14,7 +16,11 @@ bot.onText(/\/site (.+)/, (msg, match) => {
 
   const chatId = msg.chat.id;
   const resp = match[1]; // the captured "whatever"
-
+  if(!data.includes(match[1])){
+    data.push(match[1]);
+  }
+  fs.writeFileSync("data.json", JSON.stringify(data));
+  console.log(data);
   // send back the matched "whatever" to the chat
   bot.sendMessage(
     chatId,
