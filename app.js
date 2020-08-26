@@ -48,13 +48,24 @@ bot.onText(/\/time (.+)/, (msg, match) => {
     `Частота опроса теперь - 1 раз в ${resp / 1000} секунд`
   );
 });
-bot.onText(/\/show/, (msg)=>{
+bot.onText(/\/show/, (msg) => {
   const chatId = msg.chat.id;
-  data.sites.forEach(site => {
+  data.sites.forEach((site) => {
     console.log(typeof site);
-    bot.sendMessage(chatId, `Сайт в базе: ${site}`)
+    bot.sendMessage(chatId, `Сайт в базе: ${site}`);
   });
-})
+});
+bot.onText(/\/remove (.+)/, (msg, match) => {
+  const chatId = msg.chat.id;
+  const resp = match[1];
+  console.log(resp);
+  // data.sites.splice(index, 1);
+  data.sites = data.sites.filter((e) => e !== resp);
+  console.log(typeof resp);
+  // arr = arr.filter(e => e !== 'B');
+  fs.writeFileSync("data.json", JSON.stringify(data));
+  bot.sendMessage(chatId, `Сайт ${resp} удален из базы`);
+});
 
 // Listen for any kind of message. There are different kinds of
 // messages.
