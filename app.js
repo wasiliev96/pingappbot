@@ -3,15 +3,15 @@ const ping = require("ping");
 const fs = require("fs");
 // replace the value below with the Telegram token you receive from @BotFather
 const token = "1258591822:AAGFIEdaJDXFap-7CZSYGg6qUns1RXfesvU";
-let data = JSON.parse(fs.readFileSync('data.json'));
-console.log(typeof data);
+let data = JSON.parse(fs.readFileSync("data.json"));
+// console.log(typeof data);
 console.log(data);
 // Create a bot that uses 'polling' to fetch new updates
 const bot = new TelegramBot(token, { polling: true });
 let pingtime = 1000;
 
 // Matches "/echo [whatever]"
-bot.onText(/\/site (.+)/, (msg, match) => {
+bot.onText(/\/addsite (.+)/, (msg, match) => {
   // 'msg' is the received Message from Telegram
   // 'match' is the result of executing the regexp above on the text content
   // of the message
@@ -19,9 +19,9 @@ bot.onText(/\/site (.+)/, (msg, match) => {
   const chatId = msg.chat.id;
   const resp = match[1]; // the captured "whatever"
   const obj = {
-    url: resp
-  }
-  if(!data.sites.includes(match[1])){
+    url: resp,
+  };
+  if (!data.sites.includes(match[1])) {
     data.sites.push(match[1]);
   }
   fs.writeFileSync("data.json", JSON.stringify(data));
@@ -48,6 +48,13 @@ bot.onText(/\/time (.+)/, (msg, match) => {
     `Частота опроса теперь - 1 раз в ${resp / 1000} секунд`
   );
 });
+bot.onText(/\/show/, (msg)=>{
+  const chatId = msg.chat.id;
+  data.sites.forEach(site => {
+    console.log(typeof site);
+    bot.sendMessage(chatId, `Сайт в базе: ${site}`)
+  });
+})
 
 // Listen for any kind of message. There are different kinds of
 // messages.
