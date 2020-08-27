@@ -1,4 +1,7 @@
 {
+  "scripts":{
+    "start":"node ./app.js"
+  },
   "dependencies": {
     "node-telegram-bot-api": "^0.50.0",
     "ping": "^0.2.3",
