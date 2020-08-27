@@ -1,6 +1,7 @@
 const TelegramBot = require("node-telegram-bot-api");
 const ping = require("ping");
 const fs = require("fs");
+
 // replace the value below with the Telegram token you receive from @BotFather
 const token = "1258591822:AAGFIEdaJDXFap-7CZSYGg6qUns1RXfesvU";
 let data = JSON.parse(fs.readFileSync("data.json"));
@@ -10,12 +11,16 @@ console.log(data);
 const bot = new TelegramBot(token, { polling: true });
 let pingtime = 2000;
 let intervals = [];
-let currentChatId = null;
+
+// menu
+
+// end of menu
+
 bot.onText(/\/start/, (msg) => {
-  currentChatId = msg.chat.id;
+  msg.chat.id = msg.chat.id;
 });
 // Matches "/echo [whatever]"
-bot.onText(/\/addsite (.+)/, (msg, match) => {
+bot.onText(/\/add (.+)/, (msg, match) => {
   // 'msg' is the received Message from Telegram
   // 'match' is the result of executing the regexp above on the text content
   // of the message
@@ -31,7 +36,7 @@ bot.onText(/\/addsite (.+)/, (msg, match) => {
   console.log(data);
   // send back the matched "whatever" to the chat
   bot.sendMessage(
-    currentChatId,
+    msg.chat.id,
     `Сайт ${resp} записан в базу данных. Опрос будет производиться один раз в ${
       pingtime / 1000
     } секунд`
@@ -46,7 +51,7 @@ bot.onText(/\/timer (.+)/, (msg, match) => {
   pingtime = resp;
   // send back the matched "whatever" to the chat
   bot.sendMessage(
-    currentChatId,
+    msg.chat.id,
     `Частота опроса теперь - 1 раз в ${resp / 1000} секунд`
   );
 });
@@ -57,7 +62,7 @@ bot.onText(/\/stop/, (msg) => {
 bot.onText(/\/list/, (msg) => {
   data.sites.forEach((site) => {
     console.log(typeof site);
-    bot.sendMessage(currentChatId, `Сайт в базе: ${site}`);
+    bot.sendMessage(msg.chat.id, `Сайт в базе: ${site}`);
   });
 });
 bot.onText(/\/remove (.+)/, (msg, match) => {
@@ -68,11 +73,11 @@ bot.onText(/\/remove (.+)/, (msg, match) => {
   console.log(typeof resp);
   // arr = arr.filter(e => e !== 'B');
   fs.writeFileSync("data.json", JSON.stringify(data));
-  bot.sendMessage(currentChatId, `Сайт ${resp} удален из базы`);
+  bot.sendMessage(msg.chat.id, `Сайт ${resp} удален из базы`);
 });
 bot.onText(/\/run/, (msg) => {
-  runIntervals();
-  bot.sendMessage(currentChatId, `Running...`);
+  runIntervals(msg.chat.id);
+  bot.sendMessage(msg.chat.id, `Running...`);
 });
 // Listen for any kind of message. There are different kinds of
 // messages.
@@ -80,7 +85,7 @@ bot.onText(/\/run/, (msg) => {
 //
 
 //   // send a message to the chat acknowledging receipt of their message
-//   bot.sendMessage(currentChatId, 'Сайт принят');
+//   bot.sendMessage(msg.chat.id, 'Сайт принят');
 // });
 
 function stopIntervals() {
@@ -90,7 +95,7 @@ function stopIntervals() {
     arr = [];
   });
 }
-function runIntervals() {
+function runIntervals(chatId) {
   data.sites.forEach(function (host) {
     console.log(host);
     intervals.push(
@@ -100,7 +105,7 @@ function runIntervals() {
             ? "IP " + host + " = Active"
             : "IP " + host + " = Non-Active";
           console.log(info);
-          !active && bot.sendMessage(currentChatId, `${host} is down!`);
+          !active && bot.sendMessage(chatId, `${host} is down!`);
         });
       }, pingtime)
     );
