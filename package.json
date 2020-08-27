@@ -1,7 +1,6 @@
 {
   "dependencies": {
     "node-telegram-bot-api": "^0.50.0",
-    "ping": "^0.2.3",
-    "telegraf": "^3.38.0"
+    "ping": "^0.2.3"
   }
 }
